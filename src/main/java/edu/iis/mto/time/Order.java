@@ -5,6 +5,7 @@ import java.time.Clock;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class Order {
@@ -66,7 +67,7 @@ public class Order {
         }
 
         throw new OrderStateException("order should be in state "
-                + allowedStates
+                + Arrays.toString(allowedStates)
                 + " to perform required  operation, but is in "
                 + orderState);
 
