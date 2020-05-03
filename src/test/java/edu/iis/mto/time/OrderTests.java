@@ -1,88 +1,85 @@
 package edu.iis.mto.time;
 
-import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 
 import java.time.Clock;
 import java.time.Duration;
 import java.time.Instant;
 
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
 public class OrderTests {
+
+    private Clock clock;
+    private Order order;
+
+    @BeforeEach
+    public void init() {
+        clock = mock(Clock.class);
+        order = new Order(clock);
+    }
 
     @Test
     public void confirm_ExceededValidPeriodTime_OrderExpiredExceptionThrown() {
-        Clock clock = Mockito.mock(Clock.class);
-
         Instant before = Instant.now();
         Instant after = before.plus(Duration.ofHours(25));
 
-        Mockito.when(clock.instant()).thenReturn(before, after);
-
-        Order order = new Order(clock);
+        when(clock.instant()).thenReturn(before, after);
         order.submit();
 
-        Assertions.assertThrows(OrderExpiredException.class, order::confirm);
+        assertThrows(OrderExpiredException.class, order::confirm);
     }
 
     @Test
     public void confirm_PeriodTimeEqualToValidPeriodTime_NothingShouldBeThrown() {
-        Clock clock = Mockito.mock(Clock.class);
-
         Instant before = Instant.now();
         Instant after = before.plus(Duration.ofHours(24));
 
-        Mockito.when(clock.instant()).thenReturn(before, after);
+        when(clock.instant()).thenReturn(before, after);
 
-        Order order = new Order(clock);
         order.submit();
 
-        Assertions.assertDoesNotThrow(order::confirm);
+        assertDoesNotThrow(order::confirm);
     }
 
     @Test
     public void confirm_PeriodTimeLessThanValidPeriodTime_NothingShouldBeThrown() {
-        Clock clock = Mockito.mock(Clock.class);
-
         Instant before = Instant.now();
         Instant after = before.plus(Duration.ofHours(23));
 
-        Mockito.when(clock.instant()).thenReturn(before, after);
+        when(clock.instant()).thenReturn(before, after);
 
-        Order order = new Order(clock);
         order.submit();
 
-        Assertions.assertDoesNotThrow(order::confirm);
+        assertDoesNotThrow(order::confirm);
     }
 
     @Test
     public void confirm_PeriodTimeEqualToZero_NothingShouldBeThrown() {
-        Clock clock = Mockito.mock(Clock.class);
-
         Instant before = Instant.now();
         Instant after = before.plus(Duration.ofHours(0));
 
-        Mockito.when(clock.instant()).thenReturn(before, after);
+        when(clock.instant()).thenReturn(before, after);
 
-        Order order = new Order(clock);
         order.submit();
 
-        Assertions.assertDoesNotThrow(order::confirm);
+        assertDoesNotThrow(order::confirm);
     }
 
     @Test
     public void confirm_ConfirmDateEarlierThanSubmitDate_NothingShouldBeThrown() {
-        Clock clock = Mockito.mock(Clock.class);
-
         Instant before = Instant.now();
         Instant after = before.plus(Duration.ofHours(23));
 
-        Mockito.when(clock.instant()).thenReturn(after, before);
+        when(clock.instant()).thenReturn(after, before);
 
-        Order order = new Order(clock);
         order.submit();
 
-        Assertions.assertDoesNotThrow(order::confirm);
+        assertDoesNotThrow(order::confirm);
     }
 
 }
