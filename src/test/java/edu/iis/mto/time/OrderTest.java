@@ -2,6 +2,7 @@ package edu.iis.mto.time;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.mockito.internal.matchers.Equals;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mock;
@@ -36,16 +37,12 @@ class OrderTest {
         verify(timeSourceMock).currentTimeMillis();
     }
 
-    @Test
-    public void confirm_should_check_time_from_TimeSource() {
-        TimeSource timeSourceMock = mock(TimeSource.class);
+    @Test()
+    public void no_throws_exception_when_order_is_submitted_but_not_expired() {
         order.submit();
+        order.setTimeSource(new DefaultTimeSrc());
 
-        order.setTimeSource(timeSourceMock);
-        order.confirm();
-
-        verify(timeSourceMock).currentTimeMillis();
+        Assertions.assertDoesNotThrow(() -> order.confirm());
     }
-
-
+    
 }
