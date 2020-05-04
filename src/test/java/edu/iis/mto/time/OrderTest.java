@@ -18,4 +18,9 @@ class OrderTest {
         //when-than
         Assertions.assertThrows(OrderExpiredException.class, () -> order.confirm());
     }
+    @Test
+    public void throws_exception_when_order_in_wrong_state() {
+        //when-than
+        Assertions.assertThrows(OrderStateException.class, () -> order.confirm());
+    }
 }
