@@ -4,6 +4,8 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 
 class OrderTest {
 
@@ -20,7 +22,30 @@ class OrderTest {
     }
     @Test
     public void throws_exception_when_order_in_wrong_state() {
-        //when-than
         Assertions.assertThrows(OrderStateException.class, () -> order.confirm());
     }
+
+    @Test
+    public void confirm_should_check_time_from_TimeSource() {
+        TimeSource timeSourceMock = mock(TimeSource.class);
+        order.submit();
+
+        order.setTimeSource(timeSourceMock);
+        order.confirm();
+
+        verify(timeSourceMock).currentTimeMillis();
+    }
+
+    @Test
+    public void confirm_should_check_time_from_TimeSource() {
+        TimeSource timeSourceMock = mock(TimeSource.class);
+        order.submit();
+
+        order.setTimeSource(timeSourceMock);
+        order.confirm();
+
+        verify(timeSourceMock).currentTimeMillis();
+    }
+
+
 }
