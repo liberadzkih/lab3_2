@@ -12,9 +12,16 @@ public class Order {
     private State orderState;
     private List<OrderItem> items = new ArrayList<OrderItem>();
     private DateTime subbmitionDate;
+    private TimeSource timeSource;
 
     public Order() {
         orderState = State.CREATED;
+        timeSource = new DefaultTimeSrc();
+    }
+
+    public Order(TimeSource timeSource){
+        orderState = State.CREATED;
+        this.timeSource = timeSource;
     }
 
     public void addItem(OrderItem item) {
@@ -29,13 +36,14 @@ public class Order {
         requireState(State.CREATED);
 
         orderState = State.SUBMITTED;
-        subbmitionDate = new DateTime();
+        subbmitionDate = new DateTime(timeSource.currentTimeMillis());
 
     }
 
     public void confirm() {
         requireState(State.SUBMITTED);
-        int hoursElapsedAfterSubmittion = Hours.hoursBetween(subbmitionDate, new DateTime())
+        int hoursElapsedAfterSubmittion = Hours.hoursBetween(subbmitionDate,
+                new DateTime(timeSource.currentTimeMillis()))
                                                .getHours();
         if (hoursElapsedAfterSubmittion > VALID_PERIOD_HOURS) {
             orderState = State.CANCELLED;
@@ -64,6 +72,12 @@ public class Order {
                                       + " to perform required  operation, but is in "
                                       + orderState);
 
+    }
+
+
+
+    public void setTimeSource(TimeSource timeSource) {
+        this.timeSource = timeSource;
     }
 
     public enum State {
