@@ -21,4 +21,15 @@ class OrderTest {
         order = new Order(clock);
     }
 
+    @Test
+    public void shouldNotThrowExpiredOrderExceptionZeroHoursPassed() {
+        Instant now = Instant.now();
+        Instant later = Instant.now().plus(Duration.ofHours(0));
+
+        Mockito.when(clock.instant()).thenReturn(now).thenReturn(later);
+
+        order.submit();
+        assertDoesNotThrow(order::confirm);
+    }
+
 }
