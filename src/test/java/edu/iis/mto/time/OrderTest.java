@@ -32,4 +32,15 @@ class OrderTest {
         assertDoesNotThrow(order::confirm);
     }
 
+    @Test
+    public void shouldNotThrowExpiredOrderException13HoursPassed() {
+        Instant now = Instant.now();
+        Instant later = Instant.now().plus(Duration.ofHours(13));
+
+        Mockito.when(clock.instant()).thenReturn(now).thenReturn(later);
+
+        order.submit();
+        assertDoesNotThrow(order::confirm);
+    }
+
 }
