@@ -32,6 +32,13 @@ public class Order {
         subbmitionDate = new DateTime();
 
     }
+    
+    public void submit(DateTime subbmitionDate) {
+    	requireState(State.CREATED);
+
+        orderState = State.SUBMITTED;
+        this.subbmitionDate = subbmitionDate;
+    }
 
     public void confirm() {
         requireState(State.SUBMITTED);
@@ -41,6 +48,8 @@ public class Order {
             orderState = State.CANCELLED;
             throw new OrderExpiredException();
         }
+        
+        orderState = State.CONFIRMED;	// missing?
     }
 
     public void realize() {
