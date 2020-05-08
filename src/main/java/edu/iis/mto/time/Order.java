@@ -3,8 +3,9 @@ package edu.iis.mto.time;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.joda.time.DateTime; //to remove
-import org.joda.time.Hours; //to remove
+import java.time.Clock;
+import java.time.Instant;
+import java.time.Duration;
 
 
 public class Order {
@@ -12,32 +13,30 @@ public class Order {
     private static final int VALID_PERIOD_HOURS = 24;
     private State orderState;
     private List<OrderItem> items = new ArrayList<OrderItem>();
-    private DateTime subbmitionDate; //to change
+    private Clock clock;
+    private Instant subbmitionDate;
 
-    public Order() {
+    public Order(Clock clock) {
+        this.clock = clock;
         orderState = State.CREATED;
     }
 
     public void addItem(OrderItem item) {
         requireState(State.CREATED, State.SUBMITTED);
-
         items.add(item);
         orderState = State.CREATED;
-
     }
 
     public void submit() {
         requireState(State.CREATED);
-
         orderState = State.SUBMITTED;
-        subbmitionDate = new DateTime(); //to change
-
+        subbmitionDate = clock.instant();
     }
 
     public void confirm() {
         requireState(State.SUBMITTED);
-        int hoursElapsedAfterSubmittion = Hours.hoursBetween(subbmitionDate, new DateTime()) //to change
-                                               .getHours();
+        long hoursElapsedAfterSubmittion = Duration.between(subbmitionDate, clock.instant())
+                                                   .toHours();
         if (hoursElapsedAfterSubmittion > VALID_PERIOD_HOURS) {
             orderState = State.CANCELLED;
             throw new OrderExpiredException();
@@ -64,7 +63,6 @@ public class Order {
                                       + allowedStates
                                       + " to perform required  operation, but is in "
                                       + orderState);
-
     }
 
     public enum State {
