@@ -26,22 +26,22 @@ public class OrderTest {
     }
 
     @Test
-    public void confirm_OrderNotExpired_NotAtValidTime(){
+    public void confirm_OrderNotExpired_NotAtValidTime() {
         Mockito.when(mockClock.instant()).thenReturn(Instant.now());
         order.submit();
         order.confirm();
     }
 
     @Test
-    public void confirm_OrderNotExpired_AtValidTime(){
-        Mockito.when(mockClock.instant()).thenReturn(Instant.now(),Instant.now().plus(Duration.ofHours(24)));
+    public void confirm_OrderNotExpired_AtValidTime() {
+        Mockito.when(mockClock.instant()).thenReturn(Instant.now(), Instant.now().plus(Duration.ofHours(24)));
         order.submit();
         order.confirm();
     }
 
     @Test(expected = OrderExpiredException.class)
-    public void confirm_OrderExpired(){
-        Mockito.when(mockClock.instant()).thenReturn(Instant.now(),Instant.now().plus(Duration.ofHours(25)));
+    public void confirm_OrderExpired() {
+        Mockito.when(mockClock.instant()).thenReturn(Instant.now(), Instant.now().plus(Duration.ofHours(25)));
         order.submit();
         order.confirm();
     }
