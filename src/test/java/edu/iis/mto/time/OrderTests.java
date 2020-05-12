@@ -2,33 +2,46 @@ package edu.iis.mto.time;
 
 import static org.junit.Assert.assertEquals;
 
-import org.joda.time.DateTime;
+import java.time.Clock;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mockito;
 
 public class OrderTests {
+	private Clock clock;
 	private Order order;
 	
 	@Before
 	public void refresh() {
-		order = new Order(); 
+		clock = Mockito.mock(Clock.class);
+		order = new Order(clock); 
+		
+		Mockito.when(clock.instant()).thenReturn(Instant.now());
 	}
 	
 	@Test(expected = OrderExpiredException.class)
 	public void confirmAfterValidDate() {
-		order.submit(DateTime.now().minusHours(40));
+		order.submit();
+		
+		Mockito.when(clock.instant()).thenReturn(Instant.now().plus(40, ChronoUnit.HOURS));
 		order.confirm();
 	}
 	
 	@Test
 	public void confirmInValidDate() {
-		order.submit(DateTime.now().minusHours(4));
+		order.submit();
+		
+		Mockito.when(clock.instant()).thenReturn(Instant.now().plus(4, ChronoUnit.HOURS));
 		order.confirm();
 	}
 	
 	@Test
-	public void confirmWithFutureDate() {
-		order.submit(DateTime.now().plusHours(40));
+	public void confirmWithPastDate() {
+		order.submit();
+		
+		Mockito.when(clock.instant()).thenReturn(Instant.now().minus(40, ChronoUnit.HOURS));
 		order.confirm();
 	}
 	
