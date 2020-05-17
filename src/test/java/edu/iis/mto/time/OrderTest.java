@@ -18,8 +18,7 @@ public class OrderTest {
 
     @BeforeEach void setUp() {
         fakeClock = mock(Clock.class);
-        order = new Order();
-        order.setCustomClock(fakeClock);
+        order = new Order(fakeClock);
     }
 
     @Test void testWhenConfirmationIsPastTheExpirationDate_expectOrderExpiredException() {

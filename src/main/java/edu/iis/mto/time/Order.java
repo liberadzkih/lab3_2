@@ -18,6 +18,11 @@ public class Order {
         orderState = State.CREATED;
     }
 
+    public Order(Clock clock) {
+        orderState = State.CREATED;
+        this.clock = clock;
+    }
+
     public void addItem(OrderItem item) {
         requireState(State.CREATED, State.SUBMITTED);
 
@@ -62,10 +67,6 @@ public class Order {
         throw new OrderStateException(
                 "order should be in state " + allowedStates + " to perform required  operation, but is in " + orderState);
 
-    }
-
-    public void setCustomClock(Clock clock) {
-        this.clock = clock;
     }
 
     public enum State {
