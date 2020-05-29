@@ -26,4 +26,36 @@ public class OrderTest {
         instant = Instant.now();
     }
 
+    @Test(expected = OrderExpiredException.class)
+    public void confirm_shouldThrowsException_DurationGreaterThanValidPeriodTime() {
+        mockClockInstant(instant.plus(Duration.ofHours(28)));
+        order.submit();
+        order.confirm();
+    }
+
+    @Test
+    public void confirm_shouldNotThrowsException_DurationEqualsValidPeriodTime() {
+        mockClockInstant(instant.plus(Duration.ofHours(24)));
+        order.submit();
+        order.confirm();
+    }
+
+    @Test
+    public void confirm_shouldNotThrowsException_DurationEqualsSubmissionTime() {
+        mockClockInstant(instant);
+        order.submit();
+        order.confirm();
+    }
+
+    @Test
+    public void confirm_shouldNotThrowsException_DurationLessThanValidPeriodTime() {
+        mockClockInstant(instant.plus(Duration.ofHours(10)));
+        order.submit();
+        order.confirm();
+    }
+
+    private void mockClockInstant(Instant secondInstant) {
+        when(clock.instant()).thenReturn(instant, secondInstant);
+    }
+
 }
