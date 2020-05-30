@@ -6,9 +6,6 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.joda.time.DateTime;
-import org.joda.time.Hours;
-
 public class Order {
 
     private static final int VALID_PERIOD_HOURS = 24;
@@ -49,6 +46,8 @@ public class Order {
         if (hoursElapsedAfterSubmission > VALID_PERIOD_HOURS) {
             orderState = State.CANCELLED;
             throw new OrderExpiredException();
+        } else {
+            orderState = State.CONFIRMED;
         }
     }
 
@@ -68,18 +67,12 @@ public class Order {
             }
         }
 
-        throw new OrderStateException("order should be in state "
-                                      + allowedStates
-                                      + " to perform required  operation, but is in "
-                                      + orderState);
+        throw new OrderStateException(
+                "order should be in state " + allowedStates + " to perform required  operation, but is in " + orderState);
 
     }
 
     public enum State {
-        CREATED,
-        SUBMITTED,
-        CONFIRMED,
-        REALIZED,
-        CANCELLED
+        CREATED, SUBMITTED, CONFIRMED, REALIZED, CANCELLED
     }
 }
