@@ -28,15 +28,29 @@ class OrderTest {
 
     @Test
     void confirmWithin24HoursTimeShouldNotThrowException() {
-        when(clock.instant()).thenReturn(Instant.now().plus(6, ChronoUnit.HOURS));
+        when(clock.instant()).thenReturn(Instant.now(), Instant.now().plus(6, ChronoUnit.HOURS));
         order.submit();
         assertDoesNotThrow(order::confirm);
     }
 
     @Test
     void confirmAfter24HoursTimeShouldThrowException() {
-        when(clock.instant()).thenReturn(Instant.now().plus(30, ChronoUnit.HOURS));
+        when(clock.instant()).thenReturn(Instant.now(), Instant.now().plus(100, ChronoUnit.HOURS));
         order.submit();
         assertThrows(OrderExpiredException.class, order::confirm);
+    }
+
+    @Test
+    void confirmTimeFromThePastShouldNotThrowException() {
+        when(clock.instant()).thenReturn(Instant.now(), Instant.now().minus(9, ChronoUnit.HOURS));
+        order.submit();
+        assertDoesNotThrow(order::confirm);
+    }
+
+    @Test
+    void confirmTimeCurrentShouldNotThrowException() {
+        when(clock.instant()).thenReturn(Instant.now());
+        order.submit();
+        assertDoesNotThrow(order::confirm);
     }
 }
