@@ -1,20 +1,27 @@
 package edu.iis.mto.time;
 
+import java.time.Clock;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
-
-import org.joda.time.DateTime;
-import org.joda.time.Hours;
 
 public class Order {
 
     private static final int VALID_PERIOD_HOURS = 24;
     private State orderState;
     private List<OrderItem> items = new ArrayList<OrderItem>();
-    private DateTime subbmitionDate;
+    private Clock clock;
+    private Instant subbmitionDate;
 
     public Order() {
-        orderState = State.CREATED;
+        this.clock = Clock.systemDefaultZone();
+        this.orderState = State.CREATED;
+    }
+
+    public Order(Clock clock) {
+        this.clock = clock;
+        this.orderState = State.CREATED;
     }
 
     public void addItem(OrderItem item) {
@@ -29,17 +36,18 @@ public class Order {
         requireState(State.CREATED);
 
         orderState = State.SUBMITTED;
-        subbmitionDate = new DateTime();
+        subbmitionDate = clock.instant();
 
     }
 
     public void confirm() {
         requireState(State.SUBMITTED);
-        int hoursElapsedAfterSubmittion = Hours.hoursBetween(subbmitionDate, new DateTime())
-                                               .getHours();
-        if (hoursElapsedAfterSubmittion > VALID_PERIOD_HOURS) {
+        int hoursElapsedAfterSubmission = (int) Duration.between(subbmitionDate, clock.instant()).toHours();
+        if (hoursElapsedAfterSubmission > VALID_PERIOD_HOURS) {
             orderState = State.CANCELLED;
             throw new OrderExpiredException();
+        } else {
+            orderState = State.CONFIRMED;
         }
     }
 
@@ -59,18 +67,12 @@ public class Order {
             }
         }
 
-        throw new OrderStateException("order should be in state "
-                                      + allowedStates
-                                      + " to perform required  operation, but is in "
-                                      + orderState);
+        throw new OrderStateException(
+                "order should be in state " + allowedStates + " to perform required  operation, but is in " + orderState);
 
     }
 
     public enum State {
-        CREATED,
-        SUBMITTED,
-        CONFIRMED,
-        REALIZED,
-        CANCELLED
+        CREATED, SUBMITTED, CONFIRMED, REALIZED, CANCELLED
     }
 }
