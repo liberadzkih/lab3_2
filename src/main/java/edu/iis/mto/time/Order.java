@@ -1,20 +1,27 @@
 package edu.iis.mto.time;
 
+import java.time.Clock;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
-
-import org.joda.time.DateTime;
-import org.joda.time.Hours;
 
 public class Order {
 
     private static final int VALID_PERIOD_HOURS = 24;
     private State orderState;
     private List<OrderItem> items = new ArrayList<OrderItem>();
-    private DateTime subbmitionDate;
+    private Instant subbmitionDate;
+    private Clock clock;
 
     public Order() {
         orderState = State.CREATED;
+        clock = Clock.systemDefaultZone();
+    }
+    
+    public Order(Clock clock) {
+    	orderState = State.CREATED;
+    	this.clock = clock;
     }
 
     public void addItem(OrderItem item) {
@@ -29,18 +36,19 @@ public class Order {
         requireState(State.CREATED);
 
         orderState = State.SUBMITTED;
-        subbmitionDate = new DateTime();
+        subbmitionDate = clock.instant();
 
     }
 
     public void confirm() {
         requireState(State.SUBMITTED);
-        int hoursElapsedAfterSubmittion = Hours.hoursBetween(subbmitionDate, new DateTime())
-                                               .getHours();
+        long hoursElapsedAfterSubmittion = Duration.between(subbmitionDate, clock.instant()).toHours();
         if (hoursElapsedAfterSubmittion > VALID_PERIOD_HOURS) {
             orderState = State.CANCELLED;
             throw new OrderExpiredException();
         }
+        
+        orderState = State.CONFIRMED;	// missing?
     }
 
     public void realize() {
