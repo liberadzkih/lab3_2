@@ -51,7 +51,7 @@ public class Order {
         orderState = State.REALIZED;
     }
 
-    State getOrderState() {
+    public State getOrderState() {
         return orderState;
     }
 
